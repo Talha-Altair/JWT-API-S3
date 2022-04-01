@@ -23,7 +23,7 @@ Visit http://localhost:8000/ to see the API routes.
 
 - [ ] Unit tests using moto or similar library to mock AWS services
 
-- [ ] Lint and prettier configurations
+- [x] Lint and prettier configurations
 
 - [x] Dockerise the application
 

@@ -1,11 +1,12 @@
+import json
+import datetime
+import uuid
+
 from flask import Flask, jsonify, request
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, JWTManager
-import datetime
-from connections import s3
-import json
-from settings import BUCKET_NAME
 
-import uuid
+from connections import s3
+from settings import BUCKET_NAME
 
 app = Flask(__name__)
 
