@@ -21,7 +21,7 @@ Visit http://localhost:8000/ to see the API routes.
 
 ## Non Functional requirements
 
-- [ ] Unit tests using moto or similar library to mock AWS services
+- [x] Unit tests using moto or similar library to mock AWS services
 
 - [x] Lint and prettier configurations
 
