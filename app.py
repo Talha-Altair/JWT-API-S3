@@ -1,5 +1,9 @@
 from flask import Flask, jsonify, request
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, JWTManager
+import datetime
+from connections import s3
+import json
+from settings import BUCKET_NAME
 
 import uuid
 
@@ -8,6 +12,21 @@ app = Flask(__name__)
 app.config["JWT_SECRET_KEY"] = "haadha ba3da ka5eer"
 
 jwt = JWTManager(app)
+
+"""
+{
+    "uuid": "",
+    "created_by": "",
+    "created_time": "",
+    "modified_by": "",
+    "modified_time": "",
+    "body": {
+
+    }
+}
+
+
+"""
 
 
 @app.route('/ping')
@@ -36,6 +55,94 @@ def login():
     access_token = create_access_token(identity=username)
 
     return jsonify(access_token=access_token)
+
+
+@app.route("/create", methods=["POST"])
+@jwt_required()
+def create():
+
+    current_uuid = str(uuid.uuid4())
+
+    current_user = get_jwt_identity()
+
+    current_time = str(datetime.datetime.now())
+
+    data = request.json
+
+    result = {
+        "uuid": current_uuid,
+        "created_by": current_user,
+        "created_time": current_time,
+        "modified_by": current_user,
+        "modified_time": current_time,
+        "body": data
+    }
+
+    file_content = bytes(json.dumps(result), "utf-8")
+
+    file_name = "file-" + current_uuid + ".json"
+
+    s3.Bucket(BUCKET_NAME).put_object(Key=file_name, Body=file_content)
+
+    return jsonify(result)
+
+
+@app.route("/read", methods=["POST"])
+@jwt_required()
+def read():
+
+    current_uuid = request.json.get("uuid", None)
+
+    file_name = "file-" + current_uuid + ".json"
+
+    file_content = s3.Object(BUCKET_NAME, file_name).get()["Body"].read()
+
+    result = json.loads(file_content)
+
+    return jsonify(result)
+
+
+@app.route("/update", methods=["POST"])
+@jwt_required()
+def update():
+
+    current_uuid = request.json.get("uuid", None)
+
+    current_user = get_jwt_identity()
+
+    current_time = str(datetime.datetime.now())
+
+    data = request.json
+
+    result = {
+        "uuid": current_uuid,
+        "created_by": current_user,
+        "created_time": current_time,
+        "modified_by": current_user,
+        "modified_time": current_time,
+        "body": data
+    }
+
+    file_content = bytes(json.dumps(result), "utf-8")
+
+    file_name = "file-" + current_uuid + ".json"
+
+    s3.Bucket(BUCKET_NAME).put_object(Key=file_name, Body=file_content)
+
+    return jsonify(result)
+
+
+@app.route("/delete", methods=["POST"])
+@jwt_required()
+def delete():
+
+    current_uuid = request.json.get("uuid", None)
+
+    file_name = "file-" + current_uuid + ".json"
+
+    s3.Object(BUCKET_NAME, file_name).delete()
+
+    return jsonify({"msg": "deleted"})
 
 
 if __name__ == '__main__':
