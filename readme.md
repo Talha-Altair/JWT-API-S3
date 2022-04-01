@@ -73,3 +73,7 @@ curl -X POST -H "Authorization: Bearer $JWT" -H "Content-Type: application/json"
 ```
 curl -X POST -H "Authorization: Bearer $JWT" -H "Content-Type: application/json" -d '{"uuid": "<uuid>"}' http://localhost:8000/delete
 ```
+
+## Unit-Testing
+
+Once the API is running, update the ```tests.py``` file to the correct API_URL, and run ```python3 tests.py```
