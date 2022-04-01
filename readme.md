@@ -1,29 +1,75 @@
-Functional Requirements
+# JWT-API-S3
 
-API should validate a JWT token before allowing access to the caller.
+A Simple Flask server which provides an API for interacting with S3.
 
-The JSON files should be stored on an S3 bucket. Following is the schema of JSON - 
+## Installation
 
-API Resources to be exposed -
+### Docker
 
-Create file - To create a new JSON file on an S3  bucket. UUID should be used to name a new file.
+```
+docker-compose up
+```
 
-Get file - To read the contents of an existing JSON file.
+### Standalone
 
-Update file - To update the content of an existing JSON file. 
+```
+pip install -r requirements.txt
+python app.py
+```
 
-Delete File  - To delete a JSON file from the s3 bucket.
+Visit http://localhost:9000/ to see the API routes.
 
+## Non Functional requirements
 
-Non Functional requirements:
+- [ ] Unit tests using moto or similar library to mock AWS services
 
-Unit tests using moto or similar library to mock AWS services
+- [ ] Lint and prettier configurations
 
-Lint and prettier configurations
+- [x] Dockerise the application
 
-Dockerise the application
+- [x] Readme file on how to deploy and run the service. 
 
-Readme file on how to deploy and run the service. 
+## Testing
 
-Add a checklist of the above items on ReadMe and check all the items before submitting the assignment.
+### Login
 
+```
+curl -X POST -H "Content-Type: application/json" -d '{"username":"altair","password":"1234"}' http://localhost:9000/login
+
+```
+
+```
+export JWT="<enter access token here>"
+```
+
+### Test Access
+
+```
+curl -X GET -H "Authorization: Bearer $JWT" http://localhost:9000/ping
+```
+
+### Create
+
+```
+curl -X POST -H "Authorization: Bearer $JWT" -H "Content-Type: application/json" -d '{"sample":"data","lorem":"ipsum"}' http://localhost:9000/create
+```
+
+copy the uuid
+
+### Read
+
+```
+curl -X POST -H "Authorization: Bearer $JWT" -H "Content-Type: application/json" -d '{"uuid": "<uuid>"}' http://localhost:9000/read
+```
+
+### Update
+
+```
+curl -X POST -H "Authorization: Bearer $JWT" -H "Content-Type: application/json" -d '{"uuid": "<uuid>","body":{"sample":"data2","lorem2":"ipsum3"}}' http://localhost:9000/update
+```
+
+### Delete
+
+```
+curl -X POST -H "Authorization: Bearer $JWT" -H "Content-Type: application/json" -d '{"uuid": "<uuid>"}' http://localhost:9000/delete
+```

@@ -94,7 +94,13 @@ def read():
 
     file_name = "file-" + current_uuid + ".json"
 
-    file_content = s3.Object(BUCKET_NAME, file_name).get()["Body"].read()
+    try:
+
+        file_content = s3.Object(BUCKET_NAME, file_name).get()["Body"].read()
+
+    except:
+
+        return jsonify({"Error": "File not found"}), 404
 
     result = json.loads(file_content)
 
@@ -107,16 +113,32 @@ def update():
 
     current_uuid = request.json.get("uuid", None)
 
+    file_name = "file-" + current_uuid + ".json"
+
+    try:
+
+        file_content = s3.Object(BUCKET_NAME, file_name).get()["Body"].read()
+
+    except:
+
+        return jsonify({"Error": "File not found"}), 404
+
+    result = json.loads(file_content)
+
+    created_by = result["created_by"]
+
+    created_time = result["created_time"]
+
     current_user = get_jwt_identity()
 
     current_time = str(datetime.datetime.now())
 
-    data = request.json
+    data = request.json.get("body", None)
 
     result = {
         "uuid": current_uuid,
-        "created_by": current_user,
-        "created_time": current_time,
+        "created_by": created_by,
+        "created_time": created_time,
         "modified_by": current_user,
         "modified_time": current_time,
         "body": data
@@ -139,7 +161,10 @@ def delete():
 
     file_name = "file-" + current_uuid + ".json"
 
-    s3.Object(BUCKET_NAME, file_name).delete()
+    try:
+        s3.Object(BUCKET_NAME, file_name).delete()
+    except:
+        return jsonify({"Error": "File not found"}), 404
 
     return jsonify({"msg": "deleted"})
 
