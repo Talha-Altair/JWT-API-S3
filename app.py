@@ -25,7 +25,6 @@ jwt = JWTManager(app)
     }
 }
 
-
 """
 
 
